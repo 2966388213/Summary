@@ -37,6 +37,9 @@ export default navbar([
     children:[
       "/SQL",
       "/git",
+      "/other/soap_wsdl.md",
+      "/other/soap.md",
+      "/other/wsdl.md",
       "/markdown/",
       "/markdown/Markdown-it.md",
       "/other/calculation.md",
