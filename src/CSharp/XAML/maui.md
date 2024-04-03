@@ -25,3 +25,30 @@
     });
 #endif
 ```
+
+或者这样
+
+```
+#if WINDOWS
+            builder.ConfigureLifecycleEvents(events =>
+            {
+                events.AddWindows(windows =>
+                    windows.OnWindowCreated(window =>
+                    {
+                        
+                        window.SetTitleBar(new Microsoft.UI.Xaml.Controls.Grid());
+                        window.ExtendsContentIntoTitleBar = true;
+                        if (window?.AppWindow.Presenter is OverlappedPresenter pre)
+                        {
+                            pre.IsMaximizable = false;
+                            pre.IsResizable = false;
+                            pre.IsMinimizable = false;
+                            pre.SetBorderAndTitleBar(false, false);
+                        }
+                    }));
+            });
+#endif
+```
+
+## 设置当前的条件语句为WINDOWS
+> 打开项目的解决方案**xxx.csproj**，然后在**PropertyGroup**元素中添加**TargetFramework**子元素，并设置值为**windows**
