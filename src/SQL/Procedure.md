@@ -70,8 +70,26 @@ EXEC GetEmployeeInfo @EmployeeID = 123;
    DECLARE @VariableName DataType
    ```
 
+5. **在select中给变量赋值**
+   ```sql
+      DECLARE @MyVar INT
+
+      SELECT @MyVar = ColumnName
+      FROM TableName
+      WHERE Condition
+   ```
+
 5. **BEGIN...END块：**
    存储过程的主体，包含要执行的SQL语句。
+
+5. **[]中括号，包围字符**
+   在 SQL Server 中，中括号 `[]` 用于包围标识符，如列名、表名等。这主要用于以下两种情况：
+
+   1. 当标识符是 SQL Server 的保留关键字时。例如，如果你有一个名为 `Table` 的表，由于 `Table` 是一个关键字，你需要使用中括号来引用它，如 `[Table]`。
+
+   2. 当标识符包含空格或特殊字符时。例如，如果你的列名是 `Column Name`，你需要使用中括号来引用它，如 `[Column Name]`。
+
+   所以，在你给出的代码中，`[ColumnName]` 就是引用名为 `ColumnName` 的列。如果 `ColumnName` 不是关键字，也不包含空格或特殊字符，那么中括号是可选的，你也可以直接写为 `ColumnName`。
 
 6. **IF...ELSE条件：**
    ```sql
