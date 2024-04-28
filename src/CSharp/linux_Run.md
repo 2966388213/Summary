@@ -43,6 +43,11 @@ sudo rpm -Uvh https://packages.microsoft.com/config/centos/7/packages-microsoft-
 // 安装包含asp net core的运行时
 sudo yum install aspnetcore-runtime-5.0
 ```
+or ubuntu
+```sh
+sudo apt-get update && \
+  sudo apt-get install -y aspnetcore-runtime-6.0
+```
 
 ## 安装sqlserver
 ```Csharp
@@ -50,6 +55,24 @@ sudo yum install aspnetcore-runtime-5.0
 wget -O /etc/yum.repos.d/mssql-server.repo https://packages.microsoft.com/config/rhel/7/mssql-server-2017.repo
 // 安装 sqlserver
 yum install -y mssql-server
+```
+or ubuntu
+```sh
+curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg
+# 如果报错就用这个
+curl https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
+# 注册SQL Server Ubuntu存储库
+curl -fsSL https://packages.microsoft.com/config/ubuntu/22.04/mssql-server-2022.list | sudo tee /etc/apt/sources.list.d/mssql-server-2022.list
+
+# 安装SqlServer
+sudo apt-get update
+sudo apt-get install -y mssql-server
+
+# 启动SQL Server
+sudo /opt/mssql/bin/mssql-conf setup
+
+# 检查是否在运行
+systemctl status mssql-server --no-pager
 ```
 
 ## 如果服务器可用内存小于2g，需要破解内存
@@ -66,6 +89,24 @@ newfile = oldfile.replace("\x00\x94\x35\x77", "\x00\x80\x84\x1e")
 open("sqlservr", "wb").write(newfile)
 exit()
 ```
+ubuntu
+```sh
+cd /opt/mssql/bin
+
+sudo mv sqlservr sqlservr.old
+
+
+python3
+with open("sqlservr.old", "rb") as f:
+    oldfile = f.read()
+    newfile = oldfile.replace(b"\x00\x94\x35\x77", b"\x00\x80\x84\x1e")
+
+with open("sqlservr", "wb") as f:
+    f.write(newfile)
+
+quit()
+```
+
 ## 设置权限
 ```cmd
 chmod 777 /opt/mssql/bin/sqlservr

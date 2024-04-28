@@ -34,6 +34,13 @@ export default sidebar({
         collapsible: true
     },
     {
+        text: "docker",
+        icon: "laptop-code",
+        prefix: "docker/",
+        children: "structure",
+        collapsible: true
+    },
+    {
       text:"kotlin",
       icon: "laptop-code",
       prefix: "kotlin/",
