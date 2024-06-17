@@ -6,32 +6,32 @@
 1. **创建 ViewModel**：
    在 ReactiveUI 中，ViewModel 是状态管理的核心部分。你可以创建一个继承自 `ReactiveObject` 的 ViewModel，并使用 `ReactiveCommand` 来处理用户交互。
 
-   ```csharp
-   using ReactiveUI;
-   using System.Reactive;
-   
-   public class SimpleViewModel : ReactiveObject
-   {
-       private string _name;
-       public string Name
-       {
-           get => _name;
-           set => this.RaiseAndSetIfChanged(ref _name, value);
-       }
-   
-       public ReactiveCommand<Unit, Unit> SubmitCommand { get; }
-   
-       public SimpleViewModel()
-       {
-           SubmitCommand = ReactiveCommand.Create(() => { /* Your logic here */ });
-       }
-   }
+   ```cs
+    using ReactiveUI;
+    using System.Reactive;
+    
+    public class SimpleViewModel : ReactiveObject
+    {
+        private string _name;
+        public string Name
+        {
+            get => _name;
+            set => this.RaiseAndSetIfChanged(ref _name, value);
+        }
+    
+        public ReactiveCommand<Unit, Unit> SubmitCommand { get; }
+    
+        public SimpleViewModel()
+        {
+            SubmitCommand = ReactiveCommand.Create(() => { /* Your logic here */ });
+        }
+    }
    ```
 
 2. **在 Blazor 组件中绑定 ViewModel**：
    将 ViewModel 注入到 Blazor 组件中，并绑定 ViewModel 的属性和命令到组件的 UI 元素。
 
-```xml
+```
     @page "/simple"
     @using ReactiveUI.Blazor
     @inject SimpleViewModel ViewModel
@@ -52,16 +52,16 @@
 3. **在 Blazor 项目中注册 ViewModel**：
    在 `Program.cs` 中注册 ViewModel，以便在 Blazor 组件中进行依赖注入。
 
-   ```csharp
-   using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-   using Microsoft.Extensions.DependencyInjection;
-   
-   var builder = WebAssemblyHostBuilder.CreateDefault(args);
-   builder.RootComponents.Add<App>("#app");
-   
-   builder.Services.AddSingleton<SimpleViewModel>();
-   
-   await builder.Build().RunAsync();
+   ```cs
+    using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+    using Microsoft.Extensions.DependencyInjection;
+    
+    var builder = WebAssemblyHostBuilder.CreateDefault(args);
+    builder.RootComponents.Add<App>("#app");
+    
+    builder.Services.AddSingleton<SimpleViewModel>();
+    
+    await builder.Build().RunAsync();
    ```
 
 通过这种方式，`ReactiveUI.Blazor` 能够在 Blazor 中实现状态管理，使得你可以利用 ReactiveUI 的强大功能来处理复杂的状态逻辑和反应式编程。
@@ -78,51 +78,51 @@
 #### 监测单个属性的变化
 你可以使用 `WhenAnyValue` 来监测单个属性的变化，并在属性变化时执行相应的操作：
 
-```csharp
-this.WhenAnyValue(x => x.SomeProperty)
-    .Subscribe(newValue => Console.WriteLine($"SomeProperty changed to {newValue}"));
+```cs
+    this.WhenAnyValue(x => x.SomeProperty)
+        .Subscribe(newValue => Console.WriteLine($"SomeProperty changed to {newValue}"));
 ```
 
 #### 监测多个属性的变化
 你也可以监测多个属性的变化，并在任意一个属性变化时执行相应的操作：
 
-```csharp
-this.WhenAnyValue(
-    x => x.Property1,
-    x => x.Property2,
-    (prop1, prop2) => new { prop1, prop2 })
-    .Subscribe(x => Console.WriteLine($"Property1: {x.prop1}, Property2: {x.prop2}"));
+```cs
+    this.WhenAnyValue(
+        x => x.Property1,
+        x => x.Property2,
+        (prop1, prop2) => new { prop1, prop2 })
+        .Subscribe(x => Console.WriteLine($"Property1: {x.prop1}, Property2: {x.prop2}"));
 ```
 
 ### 示例代码
 以下是一个具体的示例，展示了如何在 ViewModel 中使用 `WhenAnyValue`：
 
-```csharp
-public class MyViewModel : ReactiveObject
-{
-    private string _name;
-    public string Name
+```cs
+    public class MyViewModel : ReactiveObject
     {
-        get => _name;
-        set => this.RaiseAndSetIfChanged(ref _name, value);
-    }
+        private string _name;
+        public string Name
+        {
+            get => _name;
+            set => this.RaiseAndSetIfChanged(ref _name, value);
+        }
 
-    private int _age;
-    public int Age
-    {
-        get => _age;
-        set => this.RaiseAndSetIfChanged(ref _age, value);
-    }
+        private int _age;
+        public int Age
+        {
+            get => _age;
+            set => this.RaiseAndSetIfChanged(ref _age, value);
+        }
 
-    public MyViewModel()
-    {
-        this.WhenAnyValue(x => x.Name)
-            .Subscribe(newName => Console.WriteLine($"Name changed to {newName}"));
+        public MyViewModel()
+        {
+            this.WhenAnyValue(x => x.Name)
+                .Subscribe(newName => Console.WriteLine($"Name changed to {newName}"));
 
-        this.WhenAnyValue(x => x.Age)
-            .Subscribe(newAge => Console.WriteLine($"Age changed to {newAge}"));
+            this.WhenAnyValue(x => x.Age)
+                .Subscribe(newAge => Console.WriteLine($"Age changed to {newAge}"));
+        }
     }
-}
 ```
 
 在这个示例中，当 `Name` 或 `Age` 属性发生变化时，会输出属性的新值。
@@ -142,20 +142,20 @@ public class MyViewModel : ReactiveObject
 #### 声明输出属性
 首先，我们需要声明一个输出属性，使用 `ObservableAsPropertyHelper<T>` 类：
 
-```csharp
-private readonly ObservableAsPropertyHelper<string> firstName;
-public string FirstName => firstName.Value;
+```cs
+    private readonly ObservableAsPropertyHelper<string> firstName;
+    public string FirstName => firstName.Value;
 ```
 
 #### 初始化输出属性
 然后，我们需要在视图模型的构造函数中初始化这个输出属性。通常，我们会使用 `WhenAnyValue` 或其他 `Observable` 来设置输出属性的值：
 
-```csharp
-public MyViewModel()
-{
-    this.WhenAnyValue(x => x.SomeProperty)
-        .ToProperty(this, x => x.FirstName, out firstName);
-}
+```cs
+    public MyViewModel()
+    {
+        this.WhenAnyValue(x => x.SomeProperty)
+            .ToProperty(this, x => x.FirstName, out firstName);
+    }
 ```
 
 在这个示例中，`WhenAnyValue` 用于监测 `SomeProperty` 的变化，并将其值更新到 `FirstName` 输出属性。
@@ -163,25 +163,25 @@ public MyViewModel()
 ### 示例代码
 以下是一个具体的示例，展示了如何在视图模型中使用 `ObservableAsPropertyHelper<T>`：
 
-```csharp
-public class MyViewModel : ReactiveObject
-{
-    private readonly ObservableAsPropertyHelper<string> firstName;
-    public string FirstName => firstName.Value;
-
-    private string someProperty;
-    public string SomeProperty
+```cs
+    public class MyViewModel : ReactiveObject
     {
-        get => someProperty;
-        set => this.RaiseAndSetIfChanged(ref someProperty, value);
-    }
+        private readonly ObservableAsPropertyHelper<string> firstName;
+        public string FirstName => firstName.Value;
 
-    public MyViewModel()
-    {
-        this.WhenAnyValue(x => x.SomeProperty)
-            .ToProperty(this, x => x.FirstName, out firstName);
+        private string someProperty;
+        public string SomeProperty
+        {
+            get => someProperty;
+            set => this.RaiseAndSetIfChanged(ref someProperty, value);
+        }
+
+        public MyViewModel()
+        {
+            this.WhenAnyValue(x => x.SomeProperty)
+                .ToProperty(this, x => x.FirstName, out firstName);
+        }
     }
-}
 ```
 
 在这个示例中，当 `SomeProperty` 发生变化时，`FirstName` 输出属性会自动更新。
@@ -201,11 +201,10 @@ public class MyViewModel : ReactiveObject
    - `Value`：更新后的值
    - `Sender`：属性发生变化的对象
    - `Expression`：发生变化的表达式（通常不需要外部用户使用）
-
-   ```csharp
-   this.WhenAny(x => x.ComboBox.SelectedItem)
-       .Subscribe(x => Console.WriteLine($"The {x.Sender} changed value to {x.Value}"));
-   ```
+    ```cs
+        this.WhenAny(x => x.ComboBox.SelectedItem)
+        .Subscribe(x => Console.WriteLine($"The {x.Sender} changed value to {x.Value}"));
+    ```
 
    在上面的例子中，当 `ComboBox.SelectedItem` 属性发生变化时，会输出 `Sender` 和新属性值。
 
@@ -225,48 +224,48 @@ public class MyViewModel : ReactiveObject
 1. **WhenAny**：
    `WhenAny` 方法用于监听一个或多个属性的变化，并返回一个 `IObservable`，当任何一个属性发生变化时，都会触发这个 `IObservable`。
 
-   ```csharp
-   this.WhenAny(
-       x => x.Property1,
-       x => x.Property2,
-       (prop1, prop2) => new { prop1.Value, prop2.Value })
-       .Subscribe(values =>
-       {
-           // Do something with values
-       });
+   ```cs
+        this.WhenAny(
+            x => x.Property1,
+            x => x.Property2,
+            (prop1, prop2) => new { prop1.Value, prop2.Value })
+            .Subscribe(values =>
+            {
+                // Do something with values
+            });
    ```
 
 2. **WhenActivated**：
-   `WhenActivated` 方法用于在视图（View）被激活和失活时执行一些操作。通常用于设置绑定和解除绑定。它返回一个 `IDisposable`，用于在视图失活时自动解除绑定。
+   `WhenActivated` 方法用于在视图`（View）`被激活和失活时执行一些操作。通常用于设置绑定和解除绑定。它返回一个 `IDisposable`，用于在视图失活时自动解除绑定。
 
-   ```csharp
-   this.WhenActivated(disposables =>
-   {
-       this.Bind(ViewModel, vm => vm.SomeProperty, v => v.SomeControl.Text)
-           .DisposeWith(disposables);
-   });
+   ```cs
+        this.WhenActivated(disposables =>
+        {
+            this.Bind(ViewModel, vm => vm.SomeProperty, v => v.SomeControl.Text)
+                .DisposeWith(disposables);
+    });
    ```
 
 3. **WhenAnyValue**：
    `WhenAnyValue` 是 `WhenAny` 的简化版本，用于监听单个属性的变化，并返回一个 `IObservable`，当该属性发生变化时，触发这个 `IObservable`。
 
-   ```csharp
-   this.WhenAnyValue(x => x.Property1)
-       .Subscribe(value =>
-       {
-           // Do something with value
-       });
+   ```cs
+        this.WhenAnyValue(x => x.Property1)
+            .Subscribe(value =>
+            {
+                // Do something with value
+            });
    ```
 
 4. **WhenAnyDynamic**：
    `WhenAnyDynamic` 方法用于监听动态属性的变化，适用于属性名在运行时才确定的情况。它返回一个 `IObservable`，当指定的动态属性发生变化时，触发这个 `IObservable`。
 
-   ```csharp
-   this.WhenAnyDynamic(nameof(Property1))
-       .Subscribe(value =>
-       {
-           // Do something with value
-       });
+   ```cs
+        this.WhenAnyDynamic(nameof(Property1))
+            .Subscribe(value =>
+            {
+                // Do something with value
+            });
    ```
 
 总结：
@@ -291,31 +290,31 @@ public class MyViewModel : ReactiveObject
 以下是 `Bind` 和 `OneWayBind` 的基本用法示例：
 
 #### Bind
-```csharp
-// 假设我们有一个视图模型属性和一个视图控件
-this.Bind(ViewModel, vm => vm.SomeProperty, v => v.SomeControl.Text);
+```cs
+    // 假设我们有一个视图模型属性和一个视图控件
+    this.Bind(ViewModel, vm => vm.SomeProperty, v => v.SomeControl.Text);
 ```
 在这个示例中，`SomeProperty` 是视图模型中的属性，`SomeControl.Text` 是视图中的控件属性。`Bind` 方法会将这两个属性进行双向绑定。
 
 #### OneWayBind
-```csharp
-// 假设我们有一个视图模型属性和一个视图控件
-this.OneWayBind(ViewModel, vm => vm.SomeProperty, v => v.SomeControl.Text);
+```cs
+    // 假设我们有一个视图模型属性和一个视图控件
+    this.OneWayBind(ViewModel, vm => vm.SomeProperty, v => v.SomeControl.Text);
 ```
 在这个示例中，`SomeProperty` 是视图模型中的属性，`SomeControl.Text` 是视图中的控件属性。`OneWayBind` 方法会将视图模型的属性单向绑定到视图控件。
 
 ### 绑定管理
 你可以使用 `WhenActivated` 方法来管理绑定的生命周期：
 
-```csharp
-this.WhenActivated(disposables =>
-{
-    this.Bind(ViewModel, vm => vm.SomeProperty, v => v.SomeControl.Text)
-        .DisposeWith(disposables);
-        
-    this.OneWayBind(ViewModel, vm => vm.AnotherProperty, v => v.AnotherControl.Text)
-        .DisposeWith(disposables);
-});
+```cs
+    this.WhenActivated(disposables =>
+    {
+        this.Bind(ViewModel, vm => vm.SomeProperty, v => v.SomeControl.Text)
+            .DisposeWith(disposables);
+            
+        this.OneWayBind(ViewModel, vm => vm.AnotherProperty, v => v.AnotherControl.Text)
+            .DisposeWith(disposables);
+    });
 ```
 在这个示例中，`WhenActivated` 方法确保绑定在视图激活时创建，并在视图不再激活时自动清理。
 
@@ -334,36 +333,36 @@ this.WhenActivated(disposables =>
 #### 2. 实现IViewFor<TViewModel>
 要使用绑定功能，首先需要在View中实现`IViewFor<TViewModel>`接口。一旦实现了`IViewFor<T>`，绑定方法就会作为扩展方法可用于你的类，并且可以为实现了`IActivatableViewModel`接口的视图模型启用激活和停用功能。
 
-```csharp
-public class MyView : ReactiveUserControl<MyViewModel>, IViewFor<MyViewModel>
-{
-    public MyView()
+```cs
+    public class MyView : ReactiveUserControl<MyViewModel>, IViewFor<MyViewModel>
     {
-        // 初始化组件
-        InitializeComponent();
-
-        // 使用WhenActivated管理绑定和订阅的生命周期
-        this.WhenActivated(disposables =>
+        public MyView()
         {
-            // 绑定示例
-            this.Bind(ViewModel, vm => vm.SomeProperty, v => v.SomeControl.Text)
-                .DisposeWith(disposables);
+            // 初始化组件
+            InitializeComponent();
 
-            this.BindCommand(ViewModel, vm => vm.SomeCommand, v => v.SomeButton)
-                .DisposeWith(disposables);
-        });
+            // 使用WhenActivated管理绑定和订阅的生命周期
+            this.WhenActivated(disposables =>
+            {
+                // 绑定示例
+                this.Bind(ViewModel, vm => vm.SomeProperty, v => v.SomeControl.Text)
+                    .DisposeWith(disposables);
+
+                this.BindCommand(ViewModel, vm => vm.SomeCommand, v => v.SomeButton)
+                    .DisposeWith(disposables);
+            });
+        }
+
+        // IViewFor<TViewModel>接口的实现
+        public MyViewModel ViewModel
+        {
+            get => (MyViewModel)GetValue(ViewModelProperty);
+            set => SetValue(ViewModelProperty, value);
+        }
+
+        public static readonly DependencyProperty ViewModelProperty =
+            DependencyProperty.Register(nameof(ViewModel), typeof(MyViewModel), typeof(MyView), new PropertyMetadata(null));
     }
-
-    // IViewFor<TViewModel>接口的实现
-    public MyViewModel ViewModel
-    {
-        get => (MyViewModel)GetValue(ViewModelProperty);
-        set => SetValue(ViewModelProperty, value);
-    }
-
-    public static readonly DependencyProperty ViewModelProperty =
-        DependencyProperty.Register(nameof(ViewModel), typeof(MyViewModel), typeof(MyView), new PropertyMetadata(null));
-}
 ```
 
 #### 3. 绑定数据和命令
@@ -373,24 +372,24 @@ public class MyView : ReactiveUserControl<MyViewModel>, IViewFor<MyViewModel>
 - **OneWayBind**: 单向绑定视图模型的属性到视图的控件。
 - **BindCommand**: 将视图模型的命令绑定到视图的控件事件。
 
-```csharp
-this.Bind(ViewModel, vm => vm.SomeProperty, v => v.SomeControl.Text);
-this.OneWayBind(ViewModel, vm => vm.AnotherProperty, v => v.AnotherControl.Content);
-this.BindCommand(ViewModel, vm => vm.SomeCommand, v => v.SomeButton);
+```cs
+    this.Bind(ViewModel, vm => vm.SomeProperty, v => v.SomeControl.Text);
+    this.OneWayBind(ViewModel, vm => vm.AnotherProperty, v => v.AnotherControl.Content);
+    this.BindCommand(ViewModel, vm => vm.SomeCommand, v => v.SomeButton);
 ```
 
 #### 4. 管理激活和停用
 `WhenActivated`方法用于管理绑定和订阅的生命周期。它在视图激活时创建绑定，并在视图停用时销毁绑定。
 
-```csharp
-this.WhenActivated(disposables =>
-{
-    this.Bind(ViewModel, vm => vm.SomeProperty, v => v.SomeControl.Text)
-        .DisposeWith(disposables);
+```cs
+    this.WhenActivated(disposables =>
+    {
+        this.Bind(ViewModel, vm => vm.SomeProperty, v => v.SomeControl.Text)
+            .DisposeWith(disposables);
 
-    this.BindCommand(ViewModel, vm => vm.SomeCommand, v => v.SomeButton)
-        .DisposeWith(disposables);
-});
+        this.BindCommand(ViewModel, vm => vm.SomeCommand, v => v.SomeButton)
+            .DisposeWith(disposables);
+    });
 ```
 
 #### 5. 视图定位
