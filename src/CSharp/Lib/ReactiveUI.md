@@ -1,7 +1,7 @@
 # ReactiveUI C# MVVM库
 
 ## 简单使用
-ReactiveUI.Blazor 在 Blazor 中的状态管理实现是通过利用 ReactiveUI 的功能来处理状态管理和反应式编程。以下是具体的实现方式：
+`ReactiveUI.Blazor` 在 Blazor 中的状态管理实现是通过利用 ReactiveUI 的功能来处理状态管理和反应式编程。以下是具体的实现方式：
 
 1. **创建 ViewModel**：
    在 ReactiveUI 中，ViewModel 是状态管理的核心部分。你可以创建一个继承自 `ReactiveObject` 的 ViewModel，并使用 `ReactiveCommand` 来处理用户交互。
@@ -31,23 +31,23 @@ ReactiveUI.Blazor 在 Blazor 中的状态管理实现是通过利用 ReactiveUI 
 2. **在 Blazor 组件中绑定 ViewModel**：
    将 ViewModel 注入到 Blazor 组件中，并绑定 ViewModel 的属性和命令到组件的 UI 元素。
 
-   ```razor
-   @page "/simple"
-   @using ReactiveUI.Blazor
-   @inject SimpleViewModel ViewModel
+```xml
+    @page "/simple"
+    @using ReactiveUI.Blazor
+    @inject SimpleViewModel ViewModel
 
-   <EditForm Model="@ViewModel">
-       <DataAnnotationsValidator />
-       <ValidationSummary />
-       
-       <div>
-           <label>Name:</label>
-           <InputText @bind-Value="ViewModel.Name" />
-       </div>
-       
-       <button @onclick="ViewModel.SubmitCommand.Execute">Submit</button>
-   </EditForm>
-   ```
+    <EditForm Model="@ViewModel">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        
+        <div>
+            <label>Name:</label>
+            <InputText @bind-Value="ViewModel.Name" />
+        </div>
+        
+        <button @onclick="ViewModel.SubmitCommand.Execute">Submit</button>
+    </EditForm>
+```
 
 3. **在 Blazor 项目中注册 ViewModel**：
    在 `Program.cs` 中注册 ViewModel，以便在 Blazor 组件中进行依赖注入。
@@ -64,7 +64,7 @@ ReactiveUI.Blazor 在 Blazor 中的状态管理实现是通过利用 ReactiveUI 
    await builder.Build().RunAsync();
    ```
 
-通过这种方式，ReactiveUI.Blazor 能够在 Blazor 中实现状态管理，使得你可以利用 ReactiveUI 的强大功能来处理复杂的状态逻辑和反应式编程。
+通过这种方式，`ReactiveUI.Blazor` 能够在 Blazor 中实现状态管理，使得你可以利用 ReactiveUI 的强大功能来处理复杂的状态逻辑和反应式编程。
 
 ## WhenAnyValue
 `WhenAnyValue` 是 ReactiveUI 中的一个扩展方法，用于监测属性值的变化。与 `WhenAny` 相比，`WhenAnyValue` 更加简洁，并且在大多数情况下更为常用，因为它不需要知道属性变化的发送者或表达式。
@@ -219,6 +219,61 @@ public class MyViewModel : ReactiveObject
    `WhenAny` 允许你使用 Rx 操作符以声明式的方式组合和表达逻辑。由于在可观察上下文中对时间和异步性的优先处理，处理这些概念变得更容易。
 
 综上所述，`WhenAny` 是 ReactiveUI 中用于监测属性变化的强大工具，它不仅能够处理单个属性变化，还能处理多个属性变化，并且支持多种属性类型。
+
+#### `WhenAny`、`WhenActivated`、`WhenAnyValue` 和 `WhenAnyDynamic` 是 ReactiveUI 提供的不同方法，它们有不同的用途和使用场景。以下是它们的区别：
+
+1. **WhenAny**：
+   `WhenAny` 方法用于监听一个或多个属性的变化，并返回一个 `IObservable`，当任何一个属性发生变化时，都会触发这个 `IObservable`。
+
+   ```csharp
+   this.WhenAny(
+       x => x.Property1,
+       x => x.Property2,
+       (prop1, prop2) => new { prop1.Value, prop2.Value })
+       .Subscribe(values =>
+       {
+           // Do something with values
+       });
+   ```
+
+2. **WhenActivated**：
+   `WhenActivated` 方法用于在视图（View）被激活和失活时执行一些操作。通常用于设置绑定和解除绑定。它返回一个 `IDisposable`，用于在视图失活时自动解除绑定。
+
+   ```csharp
+   this.WhenActivated(disposables =>
+   {
+       this.Bind(ViewModel, vm => vm.SomeProperty, v => v.SomeControl.Text)
+           .DisposeWith(disposables);
+   });
+   ```
+
+3. **WhenAnyValue**：
+   `WhenAnyValue` 是 `WhenAny` 的简化版本，用于监听单个属性的变化，并返回一个 `IObservable`，当该属性发生变化时，触发这个 `IObservable`。
+
+   ```csharp
+   this.WhenAnyValue(x => x.Property1)
+       .Subscribe(value =>
+       {
+           // Do something with value
+       });
+   ```
+
+4. **WhenAnyDynamic**：
+   `WhenAnyDynamic` 方法用于监听动态属性的变化，适用于属性名在运行时才确定的情况。它返回一个 `IObservable`，当指定的动态属性发生变化时，触发这个 `IObservable`。
+
+   ```csharp
+   this.WhenAnyDynamic(nameof(Property1))
+       .Subscribe(value =>
+       {
+           // Do something with value
+       });
+   ```
+
+总结：
+- `WhenAny`：监听一个或多个属性的变化。
+- `WhenActivated`：在视图激活和失活时执行操作，通常用于绑定和解除绑定。
+- `WhenAnyValue`：监听单个属性的变化。
+- `WhenAnyDynamic`：监听动态属性的变化。
 
 ## bind和OneWayBind
 `Bind` 和 `OneWayBind` 是 ReactiveUI 中用于绑定视图和视图模型的两个重要方法。它们的作用和用法如下：
